@@ -14,85 +14,101 @@ function resize() {
 window.addEventListener("resize", resize);
 resize();
 
-// VP
-const vp = {
-  x: canvas.width / 2,
-  y: canvas.height / 2,
-  r: 8,
-};
+// VPs
+const vps = [
+  { x: canvas.width * 0.3, y: canvas.height / 2, r: 8 },
+  { x: canvas.width * 0.7, y: canvas.height / 2, r: 8 },
+];
 
-// Drag Logic
-let dragging = false;
+// Interactions
+let draggingVP = null;
+let enableVertical = false;
 
+// Mouse Drag logic
 canvas.addEventListener("mousedown", (e) => {
-  const dx = e.clientX - vp.x;
-  const dy = e.clientY - vp.y;
+  const mx = e.clientX;
+  const my = e.clientY;
 
-  if (Math.hypot(dx, dy) < vp.r + 6) {
-    dragging = true;
+  for (const vp of vps) {
+    if (Math.hypot(mx - vp.x, my - vp.y) < vp.r + 6) {
+      draggingVP = vp;
+      break;
+    }
   }
 });
 
 canvas.addEventListener("mousemove", (e) => {
-  if (!dragging) return;
-  vp.x = e.clientX;
-  vp.y = e.clientY;
+  if (!draggingVP) return;
+  draggingVP.x = e.clientX;
+  draggingVP.y = e.clientY;
   draw();
 });
 
-canvas.addEventListener("mouseup", () => (dragging = false));
-canvas.addEventListener("mouseleave", () => (dragging = false));
+canvas.addEventListener("mouseup", () => (draggingVP = null));
+canvas.addEventListener("mouseleave", () => (draggingVP = null));
+
+// Keybind to toggle vertical lines going to Infinity
+window.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "v") {
+    enableVertical = !enableVertical;
+    draw();
+  }
+});
 
 // Drawing Logic
-const spacing = 60;
+const rayCount = 60;
+const rayLength = Math.max(window.innerWidth, window.innerHeight) * 2;
+const verticalSpacing = 80;
 
-function drawConvergingLines() {
+function drawRaysFromVP(vp) {
   ctx.strokeStyle = "#666";
 
-  // Top edge
-  for (let x = 0; x <= canvas.width; x += spacing) {
-    ctx.beginPath();
-    ctx.moveTo(x, 0);
-    ctx.lineTo(vp.x, vp.y);
-    ctx.stroke();
-  }
+  for (let i = 0; i < rayCount; i++) {
+    const angle = (i / rayCount) * Math.PI * 2;
+    const dx = Math.cos(angle);
+    const dy = Math.sin(angle);
 
-  // Bottom edge
-  for (let x = 0; x <= canvas.width; x += spacing) {
     ctx.beginPath();
-    ctx.moveTo(x, canvas.height);
-    ctx.lineTo(vp.x, vp.y);
-    ctx.stroke();
-  }
-
-  // Left edge
-  for (let y = 0; y <= canvas.height; y += spacing) {
-    ctx.beginPath();
-    ctx.moveTo(0, y);
-    ctx.lineTo(vp.x, vp.y);
-    ctx.stroke();
-  }
-
-  // Right edge
-  for (let y = 0; y <= canvas.height; y += spacing) {
-    ctx.beginPath();
-    ctx.moveTo(canvas.width, y);
-    ctx.lineTo(vp.x, vp.y);
+    ctx.moveTo(vp.x, vp.y);
+    ctx.lineTo(vp.x + dx * rayLength, vp.y + dy * rayLength);
     ctx.stroke();
   }
 }
 
-function drawVP() {
-  ctx.fillStyle = "#f44";
+function drawVerticalLines() {
+  ctx.strokeStyle = "#555";
+
+  for (let x = 0; x <= canvas.width; x += verticalSpacing) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvas.height);
+    ctx.stroke();
+  }
+}
+
+function drawVP(vp, color) {
+  ctx.fillStyle = color;
   ctx.beginPath();
   ctx.arc(vp.x, vp.y, vp.r, 0, Math.PI * 2);
   ctx.fill();
 }
 
+// Draw
 function draw() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  drawConvergingLines();
-  drawVP();
+
+  // Horizontal perspective
+  drawRaysFromVP(vps[0]);
+  drawRaysFromVP(vps[1]);
+
+  // Vertical perspective infinite
+  if (enableVertical) {
+    drawVerticalLines();
+  }
+
+  // Points
+  drawVP(vps[0], "#f44");
+  drawVP(vps[1], "#4af");
 }
 
 draw();
