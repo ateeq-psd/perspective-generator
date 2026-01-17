@@ -42,6 +42,8 @@ const vps = [
 ];
 
 // Input
+let isMiddleMousePressed = false;
+
 canvas.addEventListener("mousedown", (e) => {
   isMouseDown = true;
 
@@ -66,6 +68,11 @@ canvas.addEventListener("mousedown", (e) => {
       }
     }
   }
+
+  //MiddleMouse Drag
+  if (e.button === 1) {
+    isMiddleMousePressed = true;
+  }
 });
 
 canvas.addEventListener("mousemove", (e) => {
@@ -80,7 +87,7 @@ canvas.addEventListener("mousemove", (e) => {
     return;
   }
 
-  if (isSpaceDown && isMouseDown) {
+  if ((isSpaceDown && isMouseDown) || isMiddleMousePressed) {
     camera.x += e.movementX;
     camera.y += e.movementY;
   }
@@ -90,6 +97,7 @@ window.addEventListener("mouseup", () => {
   draggingVP = null;
   draggingHorizon = false;
   isMouseDown = false;
+  isMiddleMousePressed = false;
 });
 
 window.addEventListener("keydown", (e) => {
