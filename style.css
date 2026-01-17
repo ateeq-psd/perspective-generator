@@ -1,10 +1,48 @@
+html,
 body {
   margin: 0;
-  background: #111;
   overflow: hidden;
+  background: #111;
+  font-family: sans-serif;
 }
 
 canvas {
   display: block;
-  cursor: crosshair;
+}
+
+#ui {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #222;
+  color: #fff;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+#info {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  background: #222;
+  color: white;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 32px;
+  cursor: pointer;
+}
+
+#help {
+  position: fixed;
+  top: 50px;
+  right: 10px;
+  background: #222;
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+  display: none;
+  width: 240px;
 }

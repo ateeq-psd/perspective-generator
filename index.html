@@ -1,12 +1,42 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Vanishing Point</title>
+    <title>Perspective Grid Generator</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <div id="ui">
+      <label>
+        Rays:
+        <input type="range" id="raySlider" min="8" max="128" value="32" />
+      </label>
+
+      <label><input type="checkbox" id="vp1Toggle" checked /> Left VP</label>
+      <label><input type="checkbox" id="vp2Toggle" checked /> Right VP</label>
+      <label
+        ><input type="checkbox" id="vp3Toggle" checked /> Vertical VP</label
+      >
+
+      <button id="exportBtn">Export SVG</button>
+    </div>
+
+    <div id="info">ℹ️</div>
+
+    <div id="help">
+      <h3>Controls</h3>
+      <ul>
+        <li>Drag VP to move</li>
+        <li>WASD move selected VP</li>
+        <li>Shift + WASD = fast</li>
+        <li>Space + Drag = pan</li>
+        <li>Click edge arrows to select offscreen VP</li>
+        <li>V = toggle vertical VP</li>
+      </ul>
+    </div>
+
     <canvas id="canvas"></canvas>
+
     <script src="script.js"></script>
   </body>
 </html>
