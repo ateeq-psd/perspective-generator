@@ -9,8 +9,12 @@
     <div id="ui">
       <label>
         Rays:
-        <input type="range" id="raySlider" min="8" max="128" value="32" />
+        <input type="range" id="raySlider" min="8" max="512" value="32" />
       </label>
+      <label
+        ><input type="checkbox" id="snapToggle" checked /> Snap VPs to
+        Horizon</label
+      >
 
       <label><input type="checkbox" id="vp1Toggle" checked /> Left VP</label>
       <label><input type="checkbox" id="vp2Toggle" checked /> Right VP</label>
@@ -18,7 +22,7 @@
         ><input type="checkbox" id="vp3Toggle" checked /> Vertical VP</label
       >
 
-      <button id="exportBtn">Export SVG</button>
+      <button id="exportSVG">Export SVG</button>
     </div>
 
     <div id="info">ℹ️</div>
@@ -29,7 +33,7 @@
         <li>Drag VP to move</li>
         <li>WASD move selected VP</li>
         <li>Shift + WASD = fast</li>
-        <li>Space + Drag = pan</li>
+        <li>Space + Drag or MMB = pan</li>
         <li>Click edge arrows to select offscreen VP</li>
         <li>V = toggle vertical VP</li>
       </ul>

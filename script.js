@@ -10,6 +10,7 @@ const vpToggles = [
 
 const infoBtn = document.getElementById("info");
 const helpBox = document.getElementById("help");
+const snapToggle = document.getElementById("snapToggle");
 
 let rayCount = +raySlider.value;
 let selectedVP = null;
@@ -17,9 +18,14 @@ let draggingVP = null;
 let draggingHorizon = false;
 let isSpaceDown = false;
 let isMouseDown = false;
+let snapEnabled = true;
 
-// Camera
-const camera = { x: 0, y: 0 };
+function svgEl(name) {
+  return document.createElementNS("http://www.w3.org/2000/svg", name);
+}
+
+//camera
+const camera = { x: 950, y: 470 };
 
 function resize() {
   canvas.width = window.innerWidth;
@@ -36,42 +42,44 @@ const horizon = {
 
 // VPs
 const vps = [
-  { x: -600, y: 0, r: 8, color: "#f44", visible: true },
-  { x: 600, y: 0, r: 8, color: "#4af", visible: true },
-  { x: 0, y: -400, r: 8, color: "#6f6", visible: true },
+  { x: -600, y: 0, r: 8, color: "#f44", visible: true, lockH: false }, // left
+  { x: 600, y: 0, r: 8, color: "#4af", visible: true, lockH: false }, // right
+  { x: 0, y: -400, r: 8, color: "#6f6", visible: true }, // vertical
 ];
 
 // Input
-let isMiddleMousePressed = false;
 
+let isMiddleMousePressed = false;
 canvas.addEventListener("mousedown", (e) => {
   isMouseDown = true;
+  if (e.button === 1) {
+    isMiddleMousePressed = true;
+  }
 
   const wx = e.clientX - camera.x;
   const wy = e.clientY - camera.y;
 
-  // Horizon hit test
-  if (Math.abs(wy - horizon.y) < 6 && !isSpaceDown) {
-    draggingHorizon = true;
-    selectedVP = null;
-    return;
-  }
-
-  // VP drag
-  if (!isSpaceDown) {
-    for (const vp of vps) {
-      if (!vp.visible) continue;
-      if (Math.hypot(wx - vp.x, wy - vp.y) < vp.r + 6) {
-        draggingVP = vp;
-        selectedVP = vp;
-        return;
-      }
+  // VP HIT TEST FIRST (FIX)
+  for (const vp of vps) {
+    if (!vp.visible) continue;
+    if (Math.hypot(wx - vp.x, wy - vp.y) < vp.r + 6) {
+      draggingVP = vp;
+      selectedVP = vp;
+      return;
     }
   }
 
-  //MiddleMouse Drag
-  if (e.button === 1) {
-    isMiddleMousePressed = true;
+  // Horizon hit test
+  if (!isSpaceDown && Math.abs(wy - horizon.y) < 6) {
+    draggingHorizon = true;
+    selectedVP = null;
+
+    const SNAP_DIST = 12;
+
+    vps[0].lockH = Math.abs(vps[0].y - horizon.y) < SNAP_DIST;
+    vps[1].lockH = Math.abs(vps[1].y - horizon.y) < SNAP_DIST;
+
+    return;
   }
 });
 
@@ -79,14 +87,29 @@ canvas.addEventListener("mousemove", (e) => {
   if (draggingVP) {
     draggingVP.x = e.clientX - camera.x;
     draggingVP.y = e.clientY - camera.y;
+
+    // SNAP TO HORIZON (only left/right VPs)
+    if (
+      snapEnabled &&
+      !e.altKey &&
+      draggingVP !== vps[2] // not vertical VP
+    ) {
+      if (Math.abs(draggingVP.y - horizon.y) < 12) {
+        draggingVP.y = horizon.y;
+      }
+    }
     return;
   }
 
   if (draggingHorizon) {
     horizon.y = e.clientY - camera.y;
+
+    if (vps[0].lockH) vps[0].y = horizon.y;
+    if (vps[1].lockH) vps[1].y = horizon.y;
     return;
   }
 
+  // Pan: space + mouse or MMB
   if ((isSpaceDown && isMouseDown) || isMiddleMousePressed) {
     camera.x += e.movementX;
     camera.y += e.movementY;
@@ -98,6 +121,9 @@ window.addEventListener("mouseup", () => {
   draggingHorizon = false;
   isMouseDown = false;
   isMiddleMousePressed = false;
+
+  vps[0].lockH = false;
+  vps[1].lockH = false;
 });
 
 window.addEventListener("keydown", (e) => {
@@ -124,6 +150,8 @@ window.addEventListener("keyup", (e) => {
 // UI
 raySlider.oninput = () => (rayCount = +raySlider.value);
 vpToggles.forEach((t, i) => (t.onchange = () => (vps[i].visible = t.checked)));
+
+snapToggle.onchange = () => (snapEnabled = snapToggle.checked);
 
 infoBtn.onclick = () => {
   helpBox.style.display = helpBox.style.display === "block" ? "none" : "block";
@@ -224,7 +252,7 @@ canvas.addEventListener("click", (e) => {
   });
 });
 
-// Render
+// Rendering
 function loop() {
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -242,3 +270,101 @@ function loop() {
   requestAnimationFrame(loop);
 }
 loop();
+
+document.getElementById("exportSVG").onclick = () => {
+  const svg = svgEl("svg");
+
+  function svgVerticalParallels(svg) {
+    const len = Math.max(canvas.width, canvas.height) * 2;
+
+    for (let i = 0; i < rayCount; i++) {
+      const x = (i / rayCount - 0.5) * canvas.width * 2;
+
+      const line = svgEl("line");
+      line.setAttribute("x1", x);
+      line.setAttribute("y1", -len);
+      line.setAttribute("x2", x);
+      line.setAttribute("y2", len);
+      line.setAttribute("stroke", "#555");
+      line.setAttribute("stroke-width", 1);
+
+      svg.appendChild(line);
+    }
+  }
+
+  svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+  svg.setAttribute("width", canvas.width);
+  svg.setAttribute("height", canvas.height);
+  svg.setAttribute(
+    "viewBox",
+    `
+    ${-camera.x} ${-camera.y}
+    ${canvas.width} ${canvas.height}
+  `,
+  );
+
+  // Horizon
+  const h = svgEl("line");
+  h.setAttribute("x1", -10000);
+  h.setAttribute("y1", horizon.y);
+  h.setAttribute("x2", 10000);
+  h.setAttribute("y2", horizon.y);
+  h.setAttribute("stroke", "#aaa");
+  h.setAttribute("stroke-width", horizon.thickness);
+  svg.appendChild(h);
+
+  // Rays
+  vps.forEach((vp, i) => {
+    if (!vp.visible) return;
+
+    // Vertical VP ON → draw rays
+    if (i === 2) {
+      const len = Math.max(canvas.width, canvas.height) * 2;
+      for (let j = 0; j < rayCount; j++) {
+        const a = (j / rayCount) * Math.PI * 2;
+
+        const line = svgEl("line");
+        line.setAttribute("x1", vp.x);
+        line.setAttribute("y1", vp.y);
+        line.setAttribute("x2", vp.x + Math.cos(a) * len);
+        line.setAttribute("y2", vp.y + Math.sin(a) * len);
+        line.setAttribute("stroke", "#555");
+        line.setAttribute("stroke-width", 1);
+
+        svg.appendChild(line);
+      }
+      return;
+    }
+
+    // Left / Right VP
+    const len = Math.max(canvas.width, canvas.height) * 2;
+    for (let j = 0; j < rayCount; j++) {
+      const a = (j / rayCount) * Math.PI * 2;
+
+      const line = svgEl("line");
+      line.setAttribute("x1", vp.x);
+      line.setAttribute("y1", vp.y);
+      line.setAttribute("x2", vp.x + Math.cos(a) * len);
+      line.setAttribute("y2", vp.y + Math.sin(a) * len);
+      line.setAttribute("stroke", "#555");
+      line.setAttribute("stroke-width", 1);
+
+      svg.appendChild(line);
+    }
+  });
+
+  // Vertical VP OFF → draw parallels
+  if (!vps[2].visible) {
+    svgVerticalParallels(svg);
+  }
+
+  // Download
+  const serializer = new XMLSerializer();
+  const svgStr = serializer.serializeToString(svg);
+  const blob = new Blob([svgStr], { type: "image/svg+xml" });
+
+  const link = document.createElement("a");
+  link.download = "perspective.svg";
+  link.href = URL.createObjectURL(blob);
+  link.click();
+};
