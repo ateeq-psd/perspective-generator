@@ -24,3 +24,59 @@ A powerful, interactive tool for creating 1-point, 2-point, and 3-point perspect
 - **Comic & Manga** - Set up accurate backgrounds for sequential art
 - **Concept Art** - Quickly generate perspective grids for environment design
 - **Education** - Teaching and learning perspective drawing principles
+
+## How to Use
+
+### Basic Controls
+
+**Mouse:**
+
+- **Click & Drag VP** - Move vanishing points
+- **Click & Drag Horizon** - Adjust horizon line height
+- **Space + Drag** or **Middle Mouse** - Pan the canvas
+- **Alt + Drag VP** - Temporarily disable snap-to-horizon
+
+**Keyboard:**
+
+- **W/A/S/D** - Move selected vanishing point (hold Shift for faster movement)
+- **Space** - Enable pan mode
+
+### Creating Different Perspectives
+
+**1-Point Perspective:**
+
+1. Toggle off VP1 and VP2 (left and right)
+2. Keep VP3 (vertical) on
+3. Position the vertical VP on the horizon line
+
+**2-Point Perspective:**
+
+1. Toggle on VP1 and VP2 (left and right)
+2. Toggle off VP3 (vertical)
+3. Position both VPs on the horizon line
+4. Vertical lines will automatically be parallel
+
+**3-Point Perspective:**
+
+1. Toggle on all three vanishing points
+2. Position VP1 and VP2 on the horizon
+3. Position VP3 above or below the horizon for upward/downward views
+
+### Exporting Your Grid
+
+1. Set up your perspective grid as desired
+2. Click the **Export SVG** button
+3. The SVG file will download automatically
+4. Import into your favorite art software (Photoshop, Illustrator, Procreate, etc.)
+
+## 🛠️ Technical Details
+
+### Built With
+
+- **Vanilla JavaScript** - No frameworks, pure ES6+ modules
+- **HTML5 Canvas** - High-performance rendering
+- **SVG Export** - Scalable vector output
+
+**Made with ❤️ for artists, by an artist**
+
+If this tool helps your workflow, consider giving it a ⭐ on GitHub!
