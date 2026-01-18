@@ -1,7 +1,7 @@
-import { getCanvas } from './canvas.js';
-import { camera } from './camera.js';
-import { horizon, vps } from './perspective.js';
-import { state } from './state.js';
+import { getCanvas } from "./canvas.js";
+import { camera } from "./camera.js";
+import { horizon, vps } from "./perspective.js";
+import { state } from "./state.js";
 
 function svgEl(name) {
   return document.createElementNS("http://www.w3.org/2000/svg", name);
@@ -19,7 +19,7 @@ function svgVerticalParallels(svg) {
     line.setAttribute("y1", -len);
     line.setAttribute("x2", x);
     line.setAttribute("y2", len);
-    line.setAttribute("stroke", "#555");
+    line.setAttribute("stroke", "#202020");
     line.setAttribute("stroke-width", 1);
 
     svg.appendChild(line);
@@ -35,7 +35,7 @@ function exportSVG() {
   svg.setAttribute("height", canvas.height);
   svg.setAttribute(
     "viewBox",
-    `${-camera.x} ${-camera.y} ${canvas.width} ${canvas.height}`
+    `${-camera.x} ${-camera.y} ${canvas.width} ${canvas.height}`,
   );
 
   // Horizon
@@ -44,7 +44,7 @@ function exportSVG() {
   h.setAttribute("y1", horizon.y);
   h.setAttribute("x2", 10000);
   h.setAttribute("y2", horizon.y);
-  h.setAttribute("stroke", "#aaa");
+  h.setAttribute("stroke", "#383838");
   h.setAttribute("stroke-width", horizon.thickness);
   svg.appendChild(h);
 
@@ -63,7 +63,7 @@ function exportSVG() {
         line.setAttribute("y1", vp.y);
         line.setAttribute("x2", vp.x + Math.cos(a) * len);
         line.setAttribute("y2", vp.y + Math.sin(a) * len);
-        line.setAttribute("stroke", "#555");
+        line.setAttribute("stroke", "#242424");
         line.setAttribute("stroke-width", 1);
 
         svg.appendChild(line);
@@ -81,7 +81,7 @@ function exportSVG() {
       line.setAttribute("y1", vp.y);
       line.setAttribute("x2", vp.x + Math.cos(a) * len);
       line.setAttribute("y2", vp.y + Math.sin(a) * len);
-      line.setAttribute("stroke", "#555");
+      line.setAttribute("stroke", "#2b2b2b");
       line.setAttribute("stroke-width", 1);
 
       svg.appendChild(line);

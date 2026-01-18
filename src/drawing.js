@@ -1,14 +1,14 @@
-import { getCanvas, getContext } from './canvas.js';
-import { camera } from './camera.js';
-import { horizon, vps } from './perspective.js';
-import { state } from './state.js';
+import { getCanvas, getContext } from "./canvas.js";
+import { camera } from "./camera.js";
+import { horizon, vps } from "./perspective.js";
+import { state } from "./state.js";
 
 export function drawRays(vp) {
   const canvas = getCanvas();
   const ctx = getContext();
   const len = Math.max(canvas.width, canvas.height) * 2;
-  
-  ctx.strokeStyle = "#555";
+
+  ctx.strokeStyle = "#222222";
 
   for (let i = 0; i < state.rayCount; i++) {
     const a = (i / state.rayCount) * Math.PI * 2;
@@ -22,8 +22,8 @@ export function drawRays(vp) {
 export function drawVerticalParallels() {
   const canvas = getCanvas();
   const ctx = getContext();
-  
-  ctx.strokeStyle = "#555";
+
+  ctx.strokeStyle = "#1b1b1b";
   for (let i = 0; i < state.rayCount; i++) {
     const x = (i / state.rayCount - 0.5) * canvas.width * 2;
     ctx.beginPath();
@@ -35,7 +35,7 @@ export function drawVerticalParallels() {
 
 export function drawVP(vp) {
   const ctx = getContext();
-  
+
   ctx.fillStyle = vp.color;
   ctx.beginPath();
   ctx.arc(vp.x, vp.y, vp.r, 0, Math.PI * 2);
@@ -52,7 +52,7 @@ export function drawVP(vp) {
 export function drawHorizon() {
   const canvas = getCanvas();
   const ctx = getContext();
-  
+
   ctx.strokeStyle = "#aaa";
   ctx.lineWidth = horizon.thickness;
   ctx.beginPath();
@@ -65,7 +65,7 @@ export function drawHorizon() {
 export function drawEdgeIndicators() {
   const canvas = getCanvas();
   const ctx = getContext();
-  
+
   vps.forEach((vp) => {
     if (!vp.visible) return;
 
