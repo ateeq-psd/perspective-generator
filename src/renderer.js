@@ -1,13 +1,15 @@
-import { getCanvas, getContext } from './canvas.js';
-import { camera } from './camera.js';
-import { vps } from './perspective.js';
-import { 
-  drawHorizon, 
-  drawRays, 
-  drawVerticalParallels, 
-  drawVP, 
-  drawEdgeIndicators 
-} from './drawing.js';
+import { getCanvas, getContext } from "./canvas.js";
+import { camera } from "./camera.js";
+import { vps } from "./perspective.js";
+import {
+  drawHorizon,
+  drawRays,
+  drawVerticalParallels,
+  drawVP,
+  drawEdgeIndicators,
+} from "./drawing.js";
+
+import { drawVPTriangle, drawOrthocenter } from "./drawing.js";
 
 export function startRenderLoop() {
   requestAnimationFrame(loop);
@@ -16,7 +18,7 @@ export function startRenderLoop() {
 function loop() {
   const canvas = getCanvas();
   const ctx = getContext();
-  
+
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -24,6 +26,10 @@ function loop() {
 
   drawHorizon();
   vps.forEach((vp) => vp.visible && drawRays(vp));
+
+  drawVPTriangle();
+  drawOrthocenter();
+
   if (!vps[2].visible) drawVerticalParallels();
   vps.forEach((vp) => vp.visible && drawVP(vp));
 

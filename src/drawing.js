@@ -2,6 +2,7 @@ import { getCanvas, getContext } from "./canvas.js";
 import { camera } from "./camera.js";
 import { horizon, vps } from "./perspective.js";
 import { state } from "./state.js";
+import { getOrthocenter } from "./geometry.js";
 
 export function drawRays(vp) {
   const canvas = getCanvas();
@@ -53,7 +54,7 @@ export function drawHorizon() {
   const canvas = getCanvas();
   const ctx = getContext();
 
-  ctx.strokeStyle = "#aaa";
+  ctx.strokeStyle = "#2b2b2b";
   ctx.lineWidth = horizon.thickness;
   ctx.beginPath();
   ctx.moveTo(-canvas.width * 2, horizon.y);
@@ -96,4 +97,40 @@ export function drawEdgeIndicators() {
 
     vp.indicator = { x: ex, y: ey };
   });
+}
+
+export function drawVPTriangle() {
+  const ctx = getContext();
+  const visible = vps.filter((vp) => vp.visible);
+  if (visible.length !== 3) return;
+
+  ctx.strokeStyle = "#3a3a3a";
+  ctx.lineWidth = 1.5;
+
+  ctx.beginPath();
+  ctx.moveTo(visible[0].x, visible[0].y);
+  ctx.lineTo(visible[1].x, visible[1].y);
+  ctx.lineTo(visible[2].x, visible[2].y);
+  ctx.closePath();
+  ctx.stroke();
+}
+
+export function drawOrthocenter() {
+  const ctx = getContext();
+  const visible = vps.filter((vp) => vp.visible);
+  if (visible.length !== 3) return;
+
+  const [A, B, C] = visible;
+  const H = getOrthocenter(A, B, C);
+  if (!H) return;
+
+  ctx.fillStyle = "#ff5555";
+  ctx.beginPath();
+  ctx.arc(H.x, H.y, 6, 0, Math.PI * 2);
+  ctx.fill();
+
+  ctx.strokeStyle = "#ffffff";
+  ctx.beginPath();
+  ctx.arc(H.x, H.y, 10, 0, Math.PI * 2);
+  ctx.stroke();
 }
